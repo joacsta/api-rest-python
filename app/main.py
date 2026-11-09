@@ -1,19 +1,17 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, EmailStr
+from fastapi import FastAPI
+
+from app.database import Base, engine
+from app.routers import usuarios
+
+Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI()
 
 
-class Usuario(BaseModel):
-    id: int
-    nome: str
-    email: EmailStr
+app.include_router(usuarios.router)
 
 
-class UsuarioCriacao(BaseModel):
-    nome: str
-    email: EmailStr
-
-
-banco_usuarios = []
-proximo_id = 1
+@app.get("/", tags=["Health"])
+def health_check():
+    return {"status": "ok", "message": "Api funcionando"}
